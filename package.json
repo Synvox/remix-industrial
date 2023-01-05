@@ -1,0 +1,37 @@
+{
+  "private": true,
+  "sideEffects": false,
+  "scripts": {
+    "build": "remix build",
+    "dev": "remix dev",
+    "start": "remix-serve build",
+    "typecheck": "tsc -b",
+    "postinstall": "remix-esbuild-override"
+  },
+  "dependencies": {
+    "@remix-run/node": "*",
+    "@remix-run/react": "*",
+    "@remix-run/serve": "*",
+    "@types/replacestream": "4.0.1",
+    "@types/styled-components": "5.1.26",
+    "isbot": "^3.6.5",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "remix-esbuild-override": "3.0.4",
+    "replacestream": "4.0.3",
+    "styled-components": "5.3.6"
+  },
+  "devDependencies": {
+    "@babel/core": "7.20.12",
+    "@remix-run/dev": "*",
+    "@remix-run/eslint-config": "*",
+    "@types/react": "^18.0.25",
+    "@types/react-dom": "^18.0.8",
+    "babel-plugin-macros": "3.1.0",
+    "eslint": "^8.27.0",
+    "typescript": "^4.8.4"
+  },
+  "engines": {
+    "node": ">=14"
+  }
+}
