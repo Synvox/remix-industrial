@@ -7,4 +7,7 @@ export default function Index() {
 const Container = styled.div`
   background-color: blue;
   color: white;
+  &:hover {
+    background-color: green;
+  }
 `;

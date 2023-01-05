@@ -15,14 +15,7 @@ function macrosPlugin() {
         let value = cache.get(key);
 
         if (!value || value.input !== code) {
-          let plugins = [
-            "importMeta",
-            "topLevelAwait",
-            "classProperties",
-            "classPrivateProperties",
-            "classPrivateMethods",
-            "jsx",
-          ];
+          let plugins = ["jsx"];
 
           let loader = "jsx";
 
@@ -41,9 +34,6 @@ function macrosPlugin() {
               sourceType: "module",
               allowAwaitOutsideFunction: true,
               plugins,
-            },
-            generatorOpts: {
-              decoratorsBeforeExport: true,
             },
             plugins: [babelPluginMacros],
             sourceMaps: true,
