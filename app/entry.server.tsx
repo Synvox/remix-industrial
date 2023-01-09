@@ -38,7 +38,7 @@ function handleBotRequest(
   return new Promise((resolve, reject) => {
     let didError = false;
 
-    const { collectStyles, addStyles } = getExtractor();
+    const { collectStyles, transform } = getExtractor();
 
     const { pipe, abort } = renderToPipeableStream(
       collectStyles(<RemixServer context={remixContext} url={request.url} />),
@@ -49,7 +49,7 @@ function handleBotRequest(
           responseHeaders.set("Content-Type", "text/html");
 
           resolve(
-            new Response(addStyles(body), {
+            new Response(body.pipe(transform), {
               headers: responseHeaders,
               status: didError ? 500 : responseStatusCode,
             })
@@ -81,7 +81,7 @@ function handleBrowserRequest(
   return new Promise((resolve, reject) => {
     let didError = false;
 
-    const { collectStyles, addStyles } = getExtractor();
+    const { collectStyles, transform } = getExtractor();
 
     const { pipe, abort } = renderToPipeableStream(
       collectStyles(<RemixServer context={remixContext} url={request.url} />),
@@ -92,7 +92,7 @@ function handleBrowserRequest(
           responseHeaders.set("Content-Type", "text/html");
 
           resolve(
-            new Response(addStyles(body), {
+            new Response(body.pipe(transform), {
               headers: responseHeaders,
               status: didError ? 500 : responseStatusCode,
             })

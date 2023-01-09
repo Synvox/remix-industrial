@@ -1,6 +1,5 @@
 import { ReactNode } from "react";
-import ReplaceStream from "replacestream";
-import { Stream } from "stream";
+import { Transform } from "stream";
 import { ServerStyleSheet } from "styled-components";
 
 export function getExtractor() {
@@ -12,15 +11,34 @@ export function getExtractor() {
     return sheet.collectStyles(node);
   }
 
-  function addStyles(markup: string): string;
-  function addStyles(markup: Stream): Stream;
-  function addStyles(markup: string | Stream): string | Stream {
-    const styleTags = sheet.getStyleTags();
+  let firstRun = true;
 
-    if (typeof markup === "string")
-      return markup.replace(replaceString, styleTags);
-    else return markup.pipe(ReplaceStream(replaceString, styleTags));
-  }
+  const transform = new Transform({
+    transform(chunk, _, callback) {
+      if (firstRun) {
+        firstRun = false;
+        const html = sheet.getStyleTags();
+        sheet.instance.clearTag();
+        callback(null, chunk.toString().replace(replaceString, html));
+      } else {
+        const closingTagRegex = /((<\/)\w+(>))/i;
+        const renderedHtml: string = chunk.toString();
+        const match = renderedHtml.match(closingTagRegex);
+        if (match && sheet.instance.toString().length) {
+          const scriptTag = `${sheet.getStyleTags()}<script>(()=>{let d=document,s=d.currentScript;d.head.appendChild(s.previousSibling);s.parentElement.removeChild(s);})();</script>`;
+          sheet.instance.clearTag();
+          const endIndex = match.index! + match[0].length;
 
-  return { collectStyles, addStyles };
+          callback(
+            null,
+            renderedHtml.slice(0, endIndex) +
+              scriptTag +
+              renderedHtml.slice(endIndex)
+          );
+        } else callback(null, chunk);
+      }
+    },
+  });
+
+  return { collectStyles, transform };
 }
