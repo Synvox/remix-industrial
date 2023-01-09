@@ -21,7 +21,7 @@ function newGetter<T>(fn: () => Promise<T>): () => T {
 }
 
 const getUser = newGetter(async () => {
-  await new Promise((r) => setTimeout(r, 1000));
+  await new Promise((r) => setTimeout(r, 2000));
   return { id: 123 };
 });
 
@@ -29,7 +29,7 @@ export default function Index() {
   return (
     <Something>
       First
-      <Suspense fallback={null}>
+      <Suspense fallback={<Something2>Fallback</Something2>}>
         <Suspended />
       </Suspense>
     </Something>
@@ -43,6 +43,10 @@ function Suspended() {
 
 const Something = styled.div`
   padding: 10px;
+`;
+
+const Something2 = styled.div`
+  color: red;
 `;
 
 const Container = styled.div`
