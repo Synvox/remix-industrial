@@ -1,3 +1,4 @@
+import { Link } from "@remix-run/react";
 import { Suspense } from "react";
 import styled from "styled-components/macro";
 
@@ -21,14 +22,14 @@ function newGetter<T>(fn: () => Promise<T>): () => T {
 }
 
 const getUser = newGetter(async () => {
-  await new Promise((r) => setTimeout(r, 2000));
+  await new Promise((r) => setTimeout(r, 1000));
   return { id: 123 };
 });
 
 export default function Index() {
   return (
     <Something>
-      First
+      First <Link to="/2">forward</Link>
       <Suspense fallback={<Something2>Fallback</Something2>}>
         <Suspended />
       </Suspense>
