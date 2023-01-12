@@ -1,52 +1,39 @@
-import { Link } from "@remix-run/react";
+import { defer } from "@remix-run/node";
+import { Await, Link, useLoaderData } from "@remix-run/react";
 import { Suspense } from "react";
 import styled from "styled-components/macro";
 
-function newGetter<T>(fn: () => Promise<T>): () => T {
-  let promise: Promise<T> | null = null;
-  let value: T | undefined = undefined;
-  return function (): T {
-    if (value) {
-      return value;
-    }
-
-    if (!promise) {
-      promise = fn().then((x) => {
-        value = x;
-        return x;
-      });
-    }
-
-    throw promise;
-  };
-}
-
-const getUser = newGetter(async () => {
+async function getUser() {
   await new Promise((r) => setTimeout(r, 1000));
   return { id: 123 };
-});
+}
+
+export function loader() {
+  return defer({
+    user: getUser(),
+  });
+}
 
 export default function Index() {
+  const { user } = useLoaderData<typeof loader>();
   return (
     <Something>
       First <Link to="/2">forward</Link>
-      <Suspense fallback={<Something2>Fallback</Something2>}>
-        <Suspended />
+      <Suspense fallback={<Loader>Loading...</Loader>}>
+        <Await
+          resolve={user}
+          children={(user) => <Container>{user.id}</Container>}
+        />
       </Suspense>
     </Something>
   );
-}
-
-function Suspended() {
-  const user = getUser();
-  return <Container>{user.id}</Container>;
 }
 
 const Something = styled.div`
   padding: 10px;
 `;
 
-const Something2 = styled.div`
+const Loader = styled.div`
   color: red;
 `;
 

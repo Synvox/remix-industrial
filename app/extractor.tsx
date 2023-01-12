@@ -12,6 +12,17 @@ export function getExtractor() {
 
   let firstRun = true;
 
+  // Move new style tags to the head, then remove the script.
+  // This seems to avoid hydration warnings
+  const scriptTag =
+    /**/ "<script>(()=>{" +
+    /*  */ "let d=document,h=d.head,s=d.currentScript,p=s.parentElement;" +
+    /*  */ "if(p!=h)" +
+    /*    */ 'while(let e=s.previousSibling,e.matches("[data-styled]"))' +
+    /*      */ "h.appendChild(e);" +
+    /*  */ "p.removeChild(s);" +
+    /**/ "})()</script>";
+
   const transform = new Transform({
     transform(chunk, _, callback) {
       let result: string = chunk.toString();
@@ -31,10 +42,6 @@ export function getExtractor() {
           const styleTag = sheet.getStyleTags();
           sheet.instance.clearTag();
 
-          // Move new style tags to the head, then removes itself.
-          // This seems to avoid hydration warnings
-          const scriptTag = `<script>;(()=>{let d=document,s=d.currentScript;while(s.previousSibling.matches('style[data-styled]'))d.head.appendChild(s.previousSibling);s.parentElement.removeChild(s);})();</script>`;
-
           // Splice the new html into this chunk after a closing tag.
           // Closing tags seem to work better than opening tags because
           //   1. They have no attributes
@@ -52,6 +59,11 @@ export function getExtractor() {
       }
 
       callback(null, result);
+    },
+    flush(callback) {
+      if (!sheet.instance.toString().length) return callback(null, "");
+      const styleTag = sheet.getStyleTags();
+      callback(null, styleTag + scriptTag);
     },
   });
 
