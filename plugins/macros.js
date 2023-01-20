@@ -7,7 +7,7 @@ function macrosPlugin() {
   const cache = new Map();
   return {
     name: "babel-plugin-macros",
-    setup({ onLoad }) {
+    setup({ onLoad, onEnd }) {
       const root = process.cwd();
       onLoad({ filter: /\.[tj]sx$/ }, async (args) => {
         let code = await fs.promises.readFile(args.path, "utf8");
@@ -56,6 +56,9 @@ function macrosPlugin() {
         }
 
         return value.output;
+      });
+      onEnd((res) => {
+        for (let error of res.errors) console.error(error.detail);
       });
     },
   };

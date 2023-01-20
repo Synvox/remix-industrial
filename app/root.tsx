@@ -7,6 +7,8 @@ import {
   Scripts,
   ScrollRestoration,
 } from "@remix-run/react";
+import { StyleSheetManager, ThemeProvider } from "styled-components/macro";
+import { theme } from "./theme";
 
 export const meta: MetaFunction = () => ({
   charset: "utf-8",
@@ -23,7 +25,11 @@ export default function App() {
         {typeof document === "undefined" ? "__STYLES__" : null}
       </head>
       <body>
-        <Outlet />
+        <StyleSheetManager disableVendorPrefixes>
+          <ThemeProvider theme={theme}>
+            <Outlet />
+          </ThemeProvider>
+        </StyleSheetManager>
         <ScrollRestoration />
         <Scripts />
         <LiveReload />
