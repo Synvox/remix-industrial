@@ -4,7 +4,6 @@ import { Response } from "@remix-run/node";
 import { RemixServer } from "@remix-run/react";
 import isbot from "isbot";
 import { renderToPipeableStream } from "react-dom/server";
-import { getExtractor } from "./extractor";
 
 const ABORT_DELAY = 5000;
 
@@ -38,10 +37,8 @@ function handleBotRequest(
   return new Promise((resolve, reject) => {
     let didError = false;
 
-    const { collectStyles, transform } = getExtractor();
-
     const { pipe, abort } = renderToPipeableStream(
-      collectStyles(<RemixServer context={remixContext} url={request.url} />),
+      <RemixServer context={remixContext} url={request.url} />,
       {
         onAllReady() {
           const body = new PassThrough();
@@ -49,7 +46,7 @@ function handleBotRequest(
           responseHeaders.set("Content-Type", "text/html");
 
           resolve(
-            new Response(body.pipe(transform), {
+            new Response(body, {
               headers: responseHeaders,
               status: didError ? 500 : responseStatusCode,
             })
@@ -81,10 +78,8 @@ function handleBrowserRequest(
   return new Promise((resolve, reject) => {
     let didError = false;
 
-    const { collectStyles, transform } = getExtractor();
-
     const { pipe, abort } = renderToPipeableStream(
-      collectStyles(<RemixServer context={remixContext} url={request.url} />),
+      <RemixServer context={remixContext} url={request.url} />,
       {
         onShellReady() {
           const body = new PassThrough();
@@ -92,7 +87,7 @@ function handleBrowserRequest(
           responseHeaders.set("Content-Type", "text/html");
 
           resolve(
-            new Response(body.pipe(transform), {
+            new Response(body, {
               headers: responseHeaders,
               status: didError ? 500 : responseStatusCode,
             })

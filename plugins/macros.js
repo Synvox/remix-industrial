@@ -1,7 +1,7 @@
 const babel = require("@babel/core");
 const babelPluginMacros = require("babel-plugin-macros");
 const fs = require("node:fs");
-const path = require("path");
+const path = require("node:path");
 
 function macrosPlugin() {
   const cache = new Map();
@@ -10,7 +10,11 @@ function macrosPlugin() {
     setup({ onLoad, onEnd }) {
       const root = process.cwd();
       onLoad({ filter: /\.[tj]sx$/ }, async (args) => {
+        if (/^(?:.*[\\/])?node_modules(?:[\\/].*)?$/.test(args.path)) return;
+
         let code = await fs.promises.readFile(args.path, "utf8");
+        if (!/[./]macro(\.c?js)?/.test(code)) return;
+
         let key = args.path;
         let value = cache.get(key);
 
