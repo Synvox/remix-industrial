@@ -1,4 +1,3 @@
-//@ts-check
 const fs = require("fs");
 const { relative, resolve, parse } = require("path");
 const { createMacro } = require("babel-plugin-macros");
@@ -7,18 +6,14 @@ const { createMacro } = require("babel-plugin-macros");
 const css = createMacro(function ({ references, babel, state }) {
   if (!state.filename) throw new Error("state.filename is undefined.");
 
-  /** @type {string[]} */
   const styles = [];
 
   references.default.forEach((referencePath) => {
     if (babel.types.isTaggedTemplateExpression(referencePath.parent)) {
-      //@ts-expect-error
       const quasiPath = referencePath.parentPath.get("quasi");
-      //@ts-expect-error
       const valueString = quasiPath.parentPath.get("quasi").evaluate().value;
       styles.push(valueString);
       const valueNode = babel.types.identifier("__css__");
-      //@ts-expect-error
       quasiPath.parentPath.replaceWith(valueNode);
     }
   });
@@ -37,10 +32,7 @@ const css = createMacro(function ({ references, babel, state }) {
     }
   );
 
-  state.file.ast.program.body.unshift(
-    //@ts-expect-error
-    cssImport()
-  );
+  state.file.ast.program.body.unshift(cssImport());
 
   fs.mkdirSync(newDirectory, { recursive: true });
   fs.writeFileSync(

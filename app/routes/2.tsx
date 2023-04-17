@@ -5,7 +5,9 @@ export default function () {
 }
 
 const classes = css<"red">`
-  .red {
-    composes: class from "./index.module.css";
+  @value class from "./index.module.css";
+
+  .class.red {
+    color: blue;
   }
 `;
